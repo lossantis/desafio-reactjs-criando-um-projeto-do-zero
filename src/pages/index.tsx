@@ -7,6 +7,8 @@ import styles from './home.module.scss';
 
 import Prismic from '@prismicio/client';
 
+import Link from 'next/link';
+
 interface Post {
   uid?: string;
   first_publication_date: string | null;
@@ -26,11 +28,29 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home(props: PostPagination) {
+export default function Home({ results }: PostPagination) {
+
+  
   return (
-    <>
-    Home
-    </>
+    <div className={styles.posts}>
+      { results.map(post => (
+        <Link href={`post/${post.uid}`}>
+          <article key={post.uid}>
+          <h2>{post.data.title}</h2>
+          <h3>{post.data.subtitle}</h3>
+
+          <section className={styles.dateAuthorWrap}>
+            <time>{post.first_publication_date}</time>
+            <span className={styles.author}>{post.data.author}</span>
+          </section>
+        </article>
+        </Link>
+      ))}
+
+      <button className={styles.loadMorePosts}>
+        Carregar mais posts
+      </button>
+    </div>
   )
 }
 

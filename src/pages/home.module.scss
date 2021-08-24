@@ -1,1 +1,48 @@
 // TODO
+.posts {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: normal;
+
+    article {
+        h2 {
+            font-weight: bold;
+            font-size: 28px;
+            line-height: 34px;
+            text-align: justify;
+            letter-spacing: -0.5px;
+            color: #F8F8F8;
+        }
+
+        h3 {
+            font-size: 18px;
+            line-height: 22px;
+
+            text-align: justify;
+
+            color: #D7D7D7;
+        }
+
+        .dateAuthorWrap {
+            font-size: 14px;
+            line-height: 17px;
+            color: #BBBBBB;
+        }
+
+        & + article {
+            margin-top: 48px;
+        }
+    }
+
+    .loadMorePosts {
+        margin-top: 64px;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 22px;
+        text-align: justify;
+        color: #FF57B2;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+    }
+}
