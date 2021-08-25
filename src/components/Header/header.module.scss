@@ -1,1 +1,9 @@
-// TODO
+.headerLogo {
+    cursor: pointer;
+    height: 105px;
+    display: flex;
+
+    img {
+        align-self: center;
+    }
+}

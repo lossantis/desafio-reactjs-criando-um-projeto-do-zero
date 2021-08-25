@@ -34,17 +34,16 @@ export default function Home({ results }: PostPagination) {
   return (
     <div className={styles.posts}>
       { results.map(post => (
-        <Link href={`post/${post.uid}`}>
-          <article key={post.uid}>
-          <h2>{post.data.title}</h2>
+        <article key={post.uid}>
+          <Link href={`post/${post.uid}`}>
+            <h2>{post.data.title}</h2>
+          </Link>
           <h3>{post.data.subtitle}</h3>
-
           <section className={styles.dateAuthorWrap}>
             <time>{post.first_publication_date}</time>
             <span className={styles.author}>{post.data.author}</span>
           </section>
         </article>
-        </Link>
       ))}
 
       <button className={styles.loadMorePosts}>

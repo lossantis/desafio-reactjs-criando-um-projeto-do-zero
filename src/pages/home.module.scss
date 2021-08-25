@@ -1,10 +1,11 @@
-// TODO
 .posts {
     font-family: Inter;
     font-style: normal;
     font-weight: normal;
 
     article {
+        cursor: pointer;
+
         h2 {
             font-weight: bold;
             font-size: 28px;
@@ -45,4 +46,12 @@
         background-color: transparent;
         cursor: pointer;
     }
+}
+
+.headerLogo {
+    // cursor: pointer;
+    // height: 105px;
+    // display: flex;
+    // align-content: center;
+    color: red;
 }
