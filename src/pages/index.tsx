@@ -8,6 +8,9 @@ import styles from './home.module.scss';
 import Prismic from '@prismicio/client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import router from "next/router";
 
 interface Post {
   uid?: string;
@@ -28,16 +31,82 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home({ results }: PostPagination) {
-
+export default function Home({ postsPagination }: HomeProps) {
+  const { results, next_page } = postsPagination;
   
+  const [ nextPage, setNextPage ] = useState(next_page);
+  const [ currentPage, setCurrentPage ] = useState(1)
+
+  const newPosts = results.map(post => {
+    const date = new Date(post.first_publication_date);
+
+    const first_publication_date = `
+      ${date.toLocaleDateString('pt-BR', { day: 'numeric'} )}
+      ${date.toLocaleDateString('pt-BR', { month: 'short'} ).replace('.', '')}
+      ${date.toLocaleDateString('pt-BR', { year: 'numeric'} )}
+    `;
+
+    return {
+      uid: post.uid,
+      first_publication_date,
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      },
+    };
+  });
+
+  const [ posts, setPosts ] = useState<Post[]>(newPosts);
+
+  async function loadMorePosts() {
+    if (currentPage !== 1 && nextPage === null) {
+      return;
+    }
+
+    const response = await fetch(`${nextPage}`).then(response =>
+      response.json()
+    );
+
+    setNextPage(response.next_page);
+    setCurrentPage(response.page);
+
+    const newPosts = response.results.map(post => {
+      const date = new Date(post.first_publication_date);
+
+      const first_publication_date = `
+        ${date.toLocaleDateString('pt-BR', { day: 'numeric'} )}
+        ${date.toLocaleDateString('pt-BR', { month: 'short'} ).replace('.', '')}
+        ${date.toLocaleDateString('pt-BR', { year: 'numeric'} )}
+      `;
+
+      return {
+        uid: post.uid,
+        first_publication_date,
+        data: {
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+        },
+      };
+    });
+
+    setPosts([...posts, ...newPosts]);
+  }
+  
+  if (!results) {
+    return <></>
+  }
+
   return (
     <div className={styles.posts}>
-      { results.map(post => (
+      { posts.map(post => (
         <article key={post.uid}>
-          <Link href={`post/${post.uid}`}>
-            <h2>{post.data.title}</h2>
-          </Link>
+          <h2>
+            <Link href={`/post/${post.uid}`}>
+              {post.data.title}
+            </Link>
+          </h2>
           <h3>{post.data.subtitle}</h3>
           <section className={styles.dateAuthorWrap}>
             <time>{post.first_publication_date}</time>
@@ -46,14 +115,20 @@ export default function Home({ results }: PostPagination) {
         </article>
       ))}
 
-      <button className={styles.loadMorePosts}>
-        Carregar mais posts
-      </button>
+      { nextPage != null &&
+        <button className={styles.loadMorePosts}
+                style={{display: nextPage ? 'block' : 'none' }}
+                onClick={() => loadMorePosts()}
+        >
+          Carregar mais posts
+        </button>
+      }
+      
     </div>
   )
 }
 
-export const getStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
 
   const response = await prismic.query(
@@ -66,30 +141,30 @@ export const getStaticProps = async () => {
             'post.subtitle',
             'post.author',
         ],
-        pageSize: 100,
+        pageSize: 1,
     }
   )
 
-  const results = response.results.map(post => {
-      return {
-          uid: post.uid,
-          first_publication_date: new Date(post.first_publication_date).toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-          }),
-          data: {
-            title: post.data.title,
-            subtitle: post.data.subtitle,
-            author: post.data.author,
-          },
-      }
+  const posts = response.results.map(post => {
+    return {
+        uid: post.uid,
+        first_publication_date: post.first_publication_date,
+        data: {
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+        },
+    }
   })
+
+  const postsPagination = {
+    next_page: response.next_page,
+    results: posts,
+  };
 
   return {
     props: {
-      results,
-      next_page: ''
+      postsPagination
     }
   }
 };

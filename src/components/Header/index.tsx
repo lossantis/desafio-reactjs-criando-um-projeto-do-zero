@@ -4,12 +4,10 @@ import styles from './header.module.scss';
 
 export default function Header() {
   return (
-    <Link href='/'>
-    <>
-      <div className={styles.headerLogo}>
-        <img src='images/logo.svg' alt="logo"/>
-      </div>
-    </>
-    </Link>
+    <div className={styles.headerLogo}>
+      <Link href='/'>
+        <img src='/images/logo.svg' alt="logo"/>
+      </Link>
+    </div>
   )
 }
